@@ -1,5 +1,5 @@
 ---
-
+name: wallet-financial-health
 description: Analyzes Wallet data to provide a clear overview of financial health, trends, cash flow, savings, assets, liabilities, and net worth.
 mode: primary
 color: "#3F51B5"

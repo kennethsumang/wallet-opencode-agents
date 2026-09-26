@@ -1,5 +1,5 @@
 ---
-
+name: wallet-spending-analyst
 description: Analyzes Wallet spending to identify major categories, merchants, trends, changes, recurring expenses, and unusual spending patterns.
 mode: primary
 color: "#00897B"
