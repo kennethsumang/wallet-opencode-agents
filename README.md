@@ -4,7 +4,7 @@ A specialized **OpenCode Agent + Skills** package for generating polished financ
 
 > **Important:** Wallet by BudgetBakers MCP must be configured and working in OpenCode **before using this Agent**.
 
-This repository provides the Agent and Skills only. It does not install, configure, or authenticate Wallet MCP.
+This repository provides the Agent and Skills only. It does not install or configure the Wallet MCP server for you.
 
 ---
 
@@ -109,40 +109,104 @@ Checks:
 
 ---
 
-# Wallet MCP Prerequisite
+# Wallet by BudgetBakers MCP
 
-Wallet by BudgetBakers MCP must already be configured, authenticated, and working in OpenCode.
+Wallet MCP must be configured and working in OpenCode before using the Agent.
 
-This repository does **not**:
-
-* Install Wallet
-* Install Wallet MCP
-* Configure Wallet MCP
-* Provide Wallet credentials
-* Authenticate your Wallet account
-* Modify Wallet data
-
-The expected flow is:
+The official Wallet MCP uses a remote Streamable HTTP endpoint:
 
 ```text
-Wallet by BudgetBakers
-          ↓
-        MCP
-          ↓
-       OpenCode
-          ↓
-Wallet Financial Report Agent
-          ↓
-   Financial PDF Report
+https://mcp.wallet.budgetbakers.com
 ```
+
+Wallet MCP supports read and write permissions. For this Agent, **only read permissions should be enabled** in Wallet's MCP settings. Wallet's documentation states that permissions can be controlled at the Wallet level, with read access separated from create, update, and delete permissions.
+
+## 1. Add Wallet MCP to OpenCode
+
+Run:
+
+```bash
+opencode mcp add wallet --global --url https://mcp.wallet.budgetbakers.com
+```
+
+The `--global` option makes the MCP server available across your OpenCode projects. OpenCode's `mcp add` command supports adding remote MCP servers with `--url`.
+
+## 2. Authenticate Wallet MCP
+
+Wallet MCP uses OAuth 2.0 with PKCE for supported clients. OpenCode provides an MCP authentication command for OAuth-enabled servers.
+
+Run:
+
+```bash
+opencode mcp auth wallet
+```
+
+Follow the authentication prompts.
+
+If your OpenCode version instead prompts you to authenticate through the OpenCode interface, complete the displayed authentication flow.
+
+## 3. Verify the connection
+
+Run:
+
+```bash
+opencode mcp list
+```
+
+You should see the Wallet MCP server and its connection status.
+
+You can also check the configured server with:
+
+```bash
+opencode mcp ls
+```
+
+OpenCode documents `mcp list` / `mcp ls` for viewing configured MCP servers and their connection status.
+
+## 4. Enable read-only permissions in Wallet
+
+Open the Wallet web application and go to the MCP permissions settings.
+
+Enable:
+
+```text
+Read / Browse
+```
+
+Keep these disabled:
+
+```text
+Create
+Update
+Delete
+```
+
+The Wallet MCP permission system separates read access from write permissions. With write permissions disabled, the MCP server will not expose those write capabilities to the AI client.
+
+This is strongly recommended for this project because the Agent is intended to perform **financial analysis only**.
+
+### Required permission model
+
+```text
+Wallet MCP
+│
+├── Read       ✅
+├── Create     ❌
+├── Update     ❌
+└── Delete     ❌
+```
+
+The Agent itself also follows a strict read-only policy.
+
+> **Do not enable Wallet write permissions for this Agent.**
 
 ---
 
-# Manual Installation
+# Manual Agent Installation
+
+After Wallet MCP is configured, install the Agent and Skills into OpenCode's global configuration.
 
 No installation or uninstallation scripts are included.
-
-The Agent and Skills are added manually to the OpenCode global configuration.
 
 ## macOS / Linux
 
@@ -198,7 +262,9 @@ The Agent should then appear in the OpenCode Agent selector as:
 Wallet Financial Report
 ```
 
-### Windows
+---
+
+# Windows
 
 The equivalent global configuration directory is normally:
 
@@ -207,6 +273,24 @@ The equivalent global configuration directory is normally:
 ```
 
 Create the same `agents` and `skills` structure and copy the corresponding files into it.
+
+The Wallet MCP command remains:
+
+```powershell
+opencode mcp add wallet --global --url https://mcp.wallet.budgetbakers.com
+```
+
+Then authenticate:
+
+```powershell
+opencode mcp auth wallet
+```
+
+And verify:
+
+```powershell
+opencode mcp list
+```
 
 ---
 
@@ -245,7 +329,7 @@ The **Skills** provide supporting instructions used by the Agent.
 
 # Using the Agent
 
-Once Wallet MCP is working and the Agent has been installed, select:
+Once Wallet MCP is connected and the Agent has been installed, select:
 
 ```text
 Wallet Financial Report
@@ -502,6 +586,12 @@ skills/pdf-report-design/SKILL.md
 skills/report-quality-check/SKILL.md
 ```
 
+To remove the Wallet MCP server from OpenCode as well, use:
+
+```bash
+opencode mcp remove wallet
+```
+
 ---
 
 # Security
@@ -516,7 +606,7 @@ Do not store:
 * Personal financial exports
 * Generated financial reports containing sensitive data
 
-This repository should contain only the Agent, Skills, documentation, and other non-sensitive project files.
+For this Agent, keep Wallet MCP permissions **read-only**.
 
 ---
 
@@ -552,17 +642,31 @@ opencode-wallet-financial-report/
 # In Short
 
 ```text
-1. Configure Wallet by BudgetBakers MCP
-                ↓
-2. Make sure Wallet MCP works in OpenCode
-                ↓
-3. Copy the Agent + Skills into ~/.config/opencode/
-                ↓
-4. Restart OpenCode
-                ↓
-5. Select "Wallet Financial Report"
-                ↓
-6. Generate the financial report
+1. Add Wallet MCP
+        ↓
+opencode mcp add wallet --global \
+  --url https://mcp.wallet.budgetbakers.com
+
+        ↓
+2. Authenticate
+        ↓
+opencode mcp auth wallet
+
+        ↓
+3. Verify
+        ↓
+opencode mcp list
+
+        ↓
+4. Set Wallet MCP permissions to READ-ONLY
+        ↓
+5. Copy Agent + Skills into ~/.config/opencode/
+        ↓
+6. Restart OpenCode
+        ↓
+7. Select "Wallet Financial Report"
+        ↓
+8. Generate the financial report
 ```
 
-The Agent is designed to provide **complete, read-only Wallet analysis with professional financial visualization and PDF reporting**.
+The result is a **complete, read-only Wallet analysis with professional financial visualization and PDF reporting**.
