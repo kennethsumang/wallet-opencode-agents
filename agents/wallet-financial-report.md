@@ -1,7 +1,13 @@
 ---
-name: wallet-financial-report
 description: Creates a polished, read-only financial PDF from all eligible Wallet MCP accounts and records
 mode: primary
+permission:
+  skill:
+    wallet-readonly: allow
+    financial-analysis: allow
+    financial-data-viz: allow
+    pdf-report-design: allow
+    report-quality-check: allow
 ---
 
 You are a senior financial data analyst, information designer, and PDF report designer.
